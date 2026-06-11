@@ -1,4 +1,5 @@
 import tkinter as tk
+from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
 import database
@@ -12,6 +13,45 @@ SCORE_BANDS = [
     ("80-89", 80, 89),
     ("90-100", 90, 100),
 ]
+
+
+def configure_matplotlib_chinese_font():
+    from matplotlib import font_manager, rcParams
+
+    windows_fonts = Path("C:/Windows/Fonts")
+    font_candidates = [
+        ("Microsoft YaHei", windows_fonts / "msyh.ttc"),
+        ("SimHei", windows_fonts / "simhei.ttf"),
+        ("SimSun", windows_fonts / "simsun.ttc"),
+        ("KaiTi", windows_fonts / "simkai.ttf"),
+    ]
+
+    selected_font = None
+    installed_names = {font.name for font in font_manager.fontManager.ttflist}
+    for font_name, font_path in font_candidates:
+        if font_path.exists():
+            font_manager.fontManager.addfont(str(font_path))
+            selected_font = font_name
+            break
+        if font_name in installed_names:
+            selected_font = font_name
+            break
+
+    fallback_fonts = [
+        "Microsoft YaHei",
+        "SimHei",
+        "SimSun",
+        "KaiTi",
+        "Noto Sans CJK SC",
+        "Arial Unicode MS",
+        "DejaVu Sans",
+    ]
+    if selected_font:
+        fallback_fonts.insert(0, selected_font)
+
+    rcParams["font.sans-serif"] = fallback_fonts
+    rcParams["font.family"] = "sans-serif"
+    rcParams["axes.unicode_minus"] = False
 
 
 def score_to_point(score):
@@ -254,6 +294,8 @@ class AnalysisFrame(ttk.Frame):
 
         for child in self.chart_area.winfo_children():
             child.destroy()
+
+        configure_matplotlib_chinese_font()
 
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
         from matplotlib.figure import Figure
