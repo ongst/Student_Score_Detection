@@ -1,0 +1,4 @@
+__pycache__/
+*.py[cod]
+student_scores.db
+*.xlsx
